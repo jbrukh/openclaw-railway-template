@@ -368,10 +368,8 @@ app.get("/setup/api/status", requireSetupAuth, async (_req, res) => {
     {
       value: "anthropic",
       label: "Anthropic",
-      hint: "Claude Code CLI + API key",
+      hint: "API key",
       options: [
-        { value: "claude-cli", label: "Anthropic token (Claude Code CLI)" },
-        { value: "token", label: "Anthropic token (paste setup-token)" },
         { value: "apiKey", label: "Anthropic API key" },
       ],
     },
@@ -486,7 +484,7 @@ function buildOnboardArgs(payload) {
     "--gateway-token",
     OPENCLAW_GATEWAY_TOKEN,
     "--flow",
-    payload.flow || "quickstart",
+    "quickstart",
   ];
 
   if (payload.authChoice) {
@@ -512,9 +510,6 @@ function buildOnboardArgs(payload) {
       args.push(flag, secret);
     }
 
-    if (payload.authChoice === "token" && secret) {
-      args.push("--token-provider", "anthropic", "--token", secret);
-    }
   }
 
   return args;
@@ -544,13 +539,10 @@ function runCmd(cmd, args, opts = {}) {
   });
 }
 
-const VALID_FLOWS = ["quickstart", "advanced", "manual"];
 const VALID_AUTH_CHOICES = [
   "codex-cli",
   "openai-codex",
   "openai-api-key",
-  "claude-cli",
-  "token",
   "apiKey",
   "gemini-api-key",
   "google-antigravity",
@@ -570,10 +562,7 @@ const VALID_AUTH_CHOICES = [
 ];
 
 function validatePayload(payload) {
-  if (payload.flow && !VALID_FLOWS.includes(payload.flow)) {
-    return `Invalid flow: ${payload.flow}. Must be one of: ${VALID_FLOWS.join(", ")}`;
-  }
-  if (payload.authChoice && !VALID_AUTH_CHOICES.includes(payload.authChoice)) {
+if (payload.authChoice && !VALID_AUTH_CHOICES.includes(payload.authChoice)) {
     return `Invalid authChoice: ${payload.authChoice}`;
   }
   const stringFields = [
