@@ -195,3 +195,25 @@ This avoids repeatedly reading large files and provides instant context about th
 5. **Gateway spawn inherits stdio** → logs appear in wrapper output (src/server.js:134)
 6. **WebSocket auth requires proxy event handlers** → Direct `req.headers` modification doesn't work for WebSocket upgrades with http-proxy; must use `proxyReqWs` event (src/server.js:741) to reliably inject Authorization header
 7. **Control UI requires allowInsecureAuth to bypass pairing** → Set `gateway.controlUi.allowInsecureAuth=true` during onboarding to prevent "disconnected (1008): pairing required" errors (GitHub issue #2284). Wrapper already handles bearer token auth, so device pairing is unnecessary.
+
+## Personal Deployment
+
+- **Platform:** Railway
+- **Auth:** Anthropic API key (`ANTHROPIC_API_KEY`) set via `railway variables`
+- **Channels:** Telegram (primary)
+- **Persistence:** Railway volume at `/data` (`OPENCLAW_STATE_DIR=/data/.openclaw`, `OPENCLAW_WORKSPACE_DIR=/data/workspace`)
+- **Backup:** Export via `/setup/export`
+- **Crawl4ai:** Baked into Docker image at `/opt/crawl4ai-venv` with Playwright Chromium
+- **OpenClaw version:** Pinned in Dockerfile (not `@latest`) to avoid cache surprises
+
+### Previous Setup
+
+Cloudflare Worker "goffman" (moltbook-agent) — deleted Feb 2026. R2 bucket `moltbot-data` also deleted.
+
+### Action Log
+
+- **2026-02-20:** Switched auth from `claude setup-token` OAuth to proper `ANTHROPIC_API_KEY` (ends `gAA`) to comply with Anthropic ToS.
+- **2026-02-20:** Upgraded OpenClaw from `2026.2.14` to `2026.2.19-2`. Fixed version mismatch and EACCES errors. Note: `railway redeploy` doesn't bust Docker cache — need `railway up` for new versions.
+- **2026-02-20:** Reset setup to fix deprecated `codex-cli` auth choice. Added `GITHUB_TOKEN` (fine-grained PAT) for GitHub tool access.
+- **2026-02-20:** Added Chromium + system deps to Dockerfile for crawl4ai support.
+- **2026-02-24:** Forked template to jbrukh/openclaw-railway-template. Baked crawl4ai + Playwright into Dockerfile. Upgraded OpenClaw to 2026.2.23.

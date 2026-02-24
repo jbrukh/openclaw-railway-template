@@ -8,11 +8,35 @@ RUN apt-get update \
     gosu \
     procps \
     python3 \
+    python3-pip \
+    python3-venv \
     build-essential \
     zip \
+    chromium \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libcups2 \
+    libdbus-1-3 \
+    libdrm2 \
+    libgbm1 \
+    libgtk-3-0 \
+    libnspr4 \
+    libnss3 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    fonts-liberation \
+    libxss1 \
+    libasound2 \
   && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g openclaw@latest
+RUN python3 -m venv /opt/crawl4ai-venv \
+  && /opt/crawl4ai-venv/bin/pip install --no-cache-dir crawl4ai playwright \
+  && /opt/crawl4ai-venv/bin/playwright install --with-deps chromium
+
+ENV PATH="/opt/crawl4ai-venv/bin:${PATH}"
+
+RUN npm install -g openclaw@2026.2.23
 
 WORKDIR /app
 
