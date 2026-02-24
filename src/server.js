@@ -358,10 +358,8 @@ app.get("/setup/api/status", requireSetupAuth, async (_req, res) => {
     {
       value: "openai",
       label: "OpenAI",
-      hint: "Codex OAuth + API key",
+      hint: "API key",
       options: [
-        { value: "codex-cli", label: "OpenAI Codex OAuth (Codex CLI)" },
-        { value: "openai-codex", label: "OpenAI Codex (ChatGPT OAuth)" },
         { value: "openai-api-key", label: "OpenAI API key" },
       ],
     },
@@ -376,11 +374,9 @@ app.get("/setup/api/status", requireSetupAuth, async (_req, res) => {
     {
       value: "google",
       label: "Google",
-      hint: "Gemini API key + OAuth",
+      hint: "API key",
       options: [
         { value: "gemini-api-key", label: "Google Gemini API key" },
-        { value: "google-antigravity", label: "Google Antigravity OAuth" },
-        { value: "google-gemini-cli", label: "Google Gemini CLI OAuth" },
       ],
     },
     {
@@ -540,13 +536,9 @@ function runCmd(cmd, args, opts = {}) {
 }
 
 const VALID_AUTH_CHOICES = [
-  "codex-cli",
-  "openai-codex",
   "openai-api-key",
   "apiKey",
   "gemini-api-key",
-  "google-antigravity",
-  "google-gemini-cli",
   "openrouter-api-key",
   "ai-gateway-api-key",
   "moonshot-api-key",
