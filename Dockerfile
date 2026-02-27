@@ -1,5 +1,6 @@
-FROM node:22-bookworm
+FROM node:22-bookworm-slim
 
+# System deps + Chromium (single copy, shared with Playwright)
 RUN apt-get update \
   && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -13,28 +14,15 @@ RUN apt-get update \
     build-essential \
     zip \
     chromium \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libcups2 \
-    libdbus-1-3 \
-    libdrm2 \
-    libgbm1 \
-    libgtk-3-0 \
-    libnspr4 \
-    libnss3 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxrandr2 \
     fonts-liberation \
-    libxss1 \
-    libasound2 \
   && rm -rf /var/lib/apt/lists/*
 
+# crawl4ai + playwright Python packages only (skip browser download — use system Chromium)
 RUN python3 -m venv /opt/crawl4ai-venv \
-  && /opt/crawl4ai-venv/bin/pip install --no-cache-dir crawl4ai playwright \
-  && /opt/crawl4ai-venv/bin/playwright install --with-deps chromium
+  && /opt/crawl4ai-venv/bin/pip install --no-cache-dir crawl4ai playwright
 
 ENV PATH="/opt/crawl4ai-venv/bin:${PATH}"
+ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="/usr/bin/chromium"
 
 RUN npm install -g openclaw@2026.2.26
 
@@ -42,6 +30,10 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
 RUN corepack enable && pnpm install --frozen-lockfile --prod
+
+# Remove build-essential after native modules are compiled
+RUN apt-get purge -y --auto-remove build-essential \
+  && rm -rf /var/lib/apt/lists/*
 
 COPY src ./src
 COPY entrypoint.sh ./entrypoint.sh
