@@ -36,7 +36,7 @@ RUN python3 -m venv /opt/crawl4ai-venv \
 
 ENV PATH="/opt/crawl4ai-venv/bin:${PATH}"
 
-RUN npm install -g openclaw@2026.2.23
+RUN npm install -g openclaw@2026.2.26
 
 WORKDIR /app
 
